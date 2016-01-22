@@ -26,6 +26,8 @@ class SAML2_SOAPClient
 
         $ctxOpts = array(
             'ssl' => array(
+                'verify_peer' => FALSE,
+                'verify_peer_name' => FALSE,
                 'capture_peer_cert' => TRUE,
             ),
         );
