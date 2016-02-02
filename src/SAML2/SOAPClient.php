@@ -26,12 +26,15 @@ class SAML2_SOAPClient
 
         $ctxOpts = array(
             'ssl' => array(
-                'verify_peer' => FALSE,
-                'verify_peer_name' => FALSE,
-                'capture_peer_cert' => TRUE,
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+                'capture_peer_cert' => true,
+                'verify_depth' => 5,
+                'peer_name' => 'as.ite.logon.realme.govt.nz',
+                'cafile' => 'mysite/certificate-bundle.pem'
             ),
         );
-
+        
         // Determine if we are going to do a MutualSSL connection between the IdP and SP  - Shoaib
         if ($srcMetadata->hasValue('saml.SOAPClient.certificate')) {
             $cert = $srcMetadata->getValue('saml.SOAPClient.certificate');
