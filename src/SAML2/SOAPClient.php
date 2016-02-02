@@ -33,8 +33,12 @@ class SOAPClient
 
         $ctxOpts = array(
             'ssl' => array(
+                'verify_peer' => true,
+                'verify_peer_name' => true,
                 'capture_peer_cert' => true,
-                'allow_self_signed' => true
+                'verify_depth' => 5,
+                'peer_name' => 'as.ite.logon.realme.govt.nz',
+                'cafile' => 'mysite/certificate-bundle.pem'
             ),
         );
 
