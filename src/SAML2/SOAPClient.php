@@ -31,8 +31,8 @@ class SAML2_SOAPClient
                 'capture_peer_cert' => true,
                 'verify_depth' => 5,
                 'peer_name' => 'as.ite.logon.realme.govt.nz',
-                'cafile' => 'mysite/certificate-bundle.pem'
-            ),
+                'cafile' => $_SERVER['DOCUMENT_ROOT']. "/mysite/certificate-bundle.pem"
+                ),
         );
         
         // Determine if we are going to do a MutualSSL connection between the IdP and SP  - Shoaib
