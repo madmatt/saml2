@@ -126,7 +126,14 @@ class SAML2_SOAPClient
         $destination = $msg->getDestination();
 
         /* Perform SOAP Request over HTTP */
-        $soapresponsexml = $x->__doRequest($request, $destination, $action, $version);
+        for($i=0, $continue=true; $i<5 && $continue === true; $i++){
+            $soapresponsexml = $x->__doRequest($request, $destination, $action, $version);
+            if($soapresponsexml !== NULL ){
+                $continue = false;
+            }
+            sleep(5);
+        }       
+        
         if ($soapresponsexml === NULL || $soapresponsexml === "") {
             echo "Request:\n" . $x->__getLastRequest() . "\n";
             echo "Response:\n" . $x->__getLastResponse() . "\n";
