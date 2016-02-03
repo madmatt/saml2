@@ -94,6 +94,7 @@ class SAML2_SOAPClient
             'uri' => $issuer,
             'location' => $msg->getDestination(),
             'stream_context' => $context,
+            'trace' => 1
         );
 
         if ($srcMetadata->hasValue('saml.SOAPClient.proxyhost')) {
@@ -119,6 +120,12 @@ class SAML2_SOAPClient
         /* Perform SOAP Request over HTTP */
         $soapresponsexml = $x->__doRequest($request, $destination, $action, $version);
         if ($soapresponsexml === NULL || $soapresponsexml === "") {
+            echo "Request:\n" . $x->__getLastRequest() . "\n";
+            echo "Response:\n" . $x->__getLastResponse() . "\n";
+
+            var_dump($x);
+            die();
+            
             throw new Exception('Empty SOAP response, check peer certificate.');
         }
 
