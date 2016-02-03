@@ -90,6 +90,9 @@ class SAML2_SOAPClient
             throw new Exception('Unable to create SSL stream context');
         }
 
+        $old = ini_get('default_socket_timeout');
+        ini_set('default_socket_timeout', 20);
+
         $options = array(
             'uri' => $issuer,
             'location' => $msg->getDestination(),
@@ -97,8 +100,10 @@ class SAML2_SOAPClient
             'trace' => 1,
             'cache_wsdl' => WSDL_CACHE_NONE,
             'exceptions' => 1,
-            'timeout' => 20
+            'connection_timeout' => 20
         );
+
+        ini_set('default_socket_timeout', $old);
 
         if ($srcMetadata->hasValue('saml.SOAPClient.proxyhost')) {
             $options['proxy_host'] = $srcMetadata->getValue('saml.SOAPClient.proxyhost');
