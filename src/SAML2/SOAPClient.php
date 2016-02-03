@@ -94,7 +94,10 @@ class SAML2_SOAPClient
             'uri' => $issuer,
             'location' => $msg->getDestination(),
             'stream_context' => $context,
-            'trace' => 1
+            'trace' => 1,
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'exceptions' => 1,
+            'timeout' => 20
         );
 
         if ($srcMetadata->hasValue('saml.SOAPClient.proxyhost')) {
