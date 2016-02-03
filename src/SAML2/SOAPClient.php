@@ -86,8 +86,6 @@ class SAML2_SOAPClient
         }
 
         $context = stream_context_create($ctxOpts);
-        stream_set_timeout ( $context, 20);
-
         if ($context === NULL) {
             throw new Exception('Unable to create SSL stream context');
         }
@@ -100,9 +98,9 @@ class SAML2_SOAPClient
             'location' => $msg->getDestination(),
             'stream_context' => $context,
             'trace' => 1,
-            'cache_wsdl' => WSDL_CACHE_NONE,
             'exceptions' => 1,
-            'connection_timeout' => 20
+            'connection_timeout' => 20,
+            'keep_alive' => false
         );
 
         ini_set('default_socket_timeout', $old);
