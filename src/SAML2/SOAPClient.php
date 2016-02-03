@@ -86,6 +86,8 @@ class SAML2_SOAPClient
         }
 
         $context = stream_context_create($ctxOpts);
+        stream_set_timeout ( $context, 20);
+
         if ($context === NULL) {
             throw new Exception('Unable to create SSL stream context');
         }
