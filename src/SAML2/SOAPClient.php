@@ -26,13 +26,9 @@ class SAML2_SOAPClient
 
         $ctxOpts = array(
             'ssl' => array(
-                'verify_peer' => true,
-                'verify_peer_name' => true,
                 'capture_peer_cert' => true,
-                'verify_depth' => 5,
-                'peer_name' => 'as.ite.logon.realme.govt.nz',
-                'cafile' => $_SERVER['DOCUMENT_ROOT']. "/mysite/certificate-bundle.pem"
-                ),
+                'allow_self_signed' => true
+            ),
         );
         
         // Determine if we are going to do a MutualSSL connection between the IdP and SP  - Shoaib
@@ -84,26 +80,22 @@ class SAML2_SOAPClient
             $ctxOpts['ssl']['verify_depth'] = 1;
             $ctxOpts['ssl']['cafile'] = $peerCertFile;
         }
+        
+        // merge with SSL settings for this endpoint.
+        if ($srcMetadata->hasValue('saml.SOAPClient.ssl')) {
+            $ctxOpts['ssl'] = array_merge($ctxOpts['ssl'], $srcMetadata->getValue('saml.SOAPClient.ssl'));
+        }
 
         $context = stream_context_create($ctxOpts);
         if ($context === NULL) {
             throw new Exception('Unable to create SSL stream context');
         }
-
-        $old = ini_get('default_socket_timeout');
-        ini_set('default_socket_timeout', 20);
-
+        
         $options = array(
             'uri' => $issuer,
             'location' => $msg->getDestination(),
-            'stream_context' => $context,
-            'trace' => 1,
-            'exceptions' => 1,
-            'connection_timeout' => 20,
-            'keep_alive' => false
+            'stream_context' => $context
         );
-
-        ini_set('default_socket_timeout', $old);
 
         if ($srcMetadata->hasValue('saml.SOAPClient.proxyhost')) {
             $options['proxy_host'] = $srcMetadata->getValue('saml.SOAPClient.proxyhost');
@@ -125,22 +117,17 @@ class SAML2_SOAPClient
         $version = '1.1';
         $destination = $msg->getDestination();
 
-        /* Perform SOAP Request over HTTP */
-        for($i=0, $continue=true; $i<5 && $continue === true; $i++){
+        /* Perform SOAP Request over HTTP, and retry on failure up to 5 times. */
+        $soapresponsexml = null;
+        for ($i = 0, $continue = true; $i < 5 && $continue === true; $i++) {
             $soapresponsexml = $x->__doRequest($request, $destination, $action, $version);
-            if($soapresponsexml !== NULL ){
+            if($soapresponsexml !== NULL){
                 $continue = false;
             }
-            sleep(5);
-        }       
+            sleep(2);
+        }   
         
         if ($soapresponsexml === NULL || $soapresponsexml === "") {
-            echo "Request:\n" . $x->__getLastRequest() . "\n";
-            echo "Response:\n" . $x->__getLastResponse() . "\n";
-
-            var_dump($x);
-            die();
-            
             throw new Exception('Empty SOAP response, check peer certificate.');
         }
 
